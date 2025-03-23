@@ -1,7 +1,10 @@
 import sys
 import sqlite3
 from PyQt6 import uic
-from PyQt6.QtWidgets import QApplication, QMainWindow, QTableWidgetItem
+from PyQt6.QtWidgets import (
+    QApplication, QMainWindow, QTableWidgetItem, QPushButton
+)
+from add_edit import AddEditCoffeeForm
 
 
 class MyWidget(QMainWindow):
@@ -9,6 +12,15 @@ class MyWidget(QMainWindow):
         super().__init__()
         uic.loadUi("main.ui", self)
         self.load_data()
+
+        self.addButton = QPushButton("Добавить", self)
+        self.addButton.move(10, 560)
+
+        self.editButton = QPushButton("Редактировать", self)
+        self.editButton.move(120, 560)
+
+        self.addButton.clicked.connect(self.add_coffee)
+        self.editButton.clicked.connect(self.edit_coffee)
 
     def load_data(self):
         con = sqlite3.connect("coffee.sqlite")
@@ -26,6 +38,19 @@ class MyWidget(QMainWindow):
             for col, item in enumerate(record):
                 display = "Молотый" if col == 3 and item else "В зёрнах" if col == 3 else str(item)
                 self.tableWidget.setItem(row, col, QTableWidgetItem(display))
+
+    def add_coffee(self):
+        dlg = AddEditCoffeeForm()
+        if dlg.exec():
+            self.load_data()
+
+    def edit_coffee(self):
+        selected = self.tableWidget.currentRow()
+        if selected != -1:
+            coffee_id = int(self.tableWidget.item(selected, 0).text())
+            dlg = AddEditCoffeeForm(coffee_id)
+            if dlg.exec():
+                self.load_data()
 
 
 if __name__ == '__main__':
