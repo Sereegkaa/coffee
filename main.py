@@ -1,6 +1,6 @@
 import sys
 import sqlite3
-from PyQt6 import uic
+from ui_main import Ui_MainWindow
 from PyQt6.QtWidgets import (
     QApplication, QMainWindow, QTableWidgetItem, QPushButton
 )
@@ -10,7 +10,8 @@ from add_edit import AddEditCoffeeForm
 class MyWidget(QMainWindow):
     def __init__(self):
         super().__init__()
-        uic.loadUi("main.ui", self)
+        self.ui = Ui_MainWindow()
+        self.ui.setupUi(self)
         self.load_data()
 
         self.addButton = QPushButton("Добавить", self)
@@ -23,7 +24,7 @@ class MyWidget(QMainWindow):
         self.editButton.clicked.connect(self.edit_coffee)
 
     def load_data(self):
-        con = sqlite3.connect("coffee.sqlite")
+        con = sqlite3.connect("release/data/coffee.sqlite")
         cur = con.cursor()
         result = cur.execute("SELECT * FROM coffee").fetchall()
         con.close()
